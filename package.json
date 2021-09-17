@@ -1,5 +1,5 @@
 {
-  "name": "nft_service_runner",
+  "name": "promenade-marketplace-tracker",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,6 @@
     "dev": "npx nodemon app.js"
   },
   "keywords": [],
-  "author": "Jason",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",
