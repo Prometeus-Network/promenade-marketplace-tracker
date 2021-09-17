@@ -1,0 +1,35 @@
+name: Deploy
+
+env:
+  REGISTRY: registry.digitalocean.com
+  IMAGE_NAME: promenade/promenade-marketplace-tracker
+  HELM_CHART: promenade-marketplace-tracker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set environmental variables
+        env:
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          export BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)
+          echo "IMAGE_TAG=$GITHUB_SHA" >> "$GITHUB_ENV"
+
+          if [[ $BRANCH == 'main'  ]]; then
+              echo "CHART=testnet" >> "$GITHUB_ENV"
+          else
+              echo "CHART=testnet" >> "$GITHUB_ENV"
+          fi
+      - name: Deploy to k8s
+        uses: wahyd4/kubectl-helm-action@master
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        with:
+          args: |
+            helm upgrade --install --set=image.tag=$IMAGE_TAG -f ./charts/$HELM_CHART/$CHART.yaml $HELM_CHART ./charts/$HELM_CHART --kubeconfig /tmp/config
