@@ -50,7 +50,7 @@ spec:
           env:
             {{- range .Values.environmentVariables }}
             - name: {{ .name }}
-              value: {{ .value }}
+              value: {{ .value | quote }}
             {{- end }} 
       {{- with .Values.nodeSelector }}
       nodeSelector:
