@@ -86,3 +86,13 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+envFrom:
+  - secretRef:
+      name: promenade-marketplace-tracker-secret
+  - secretRef:
+      name: promenade-shared-secret
+  - configMapRef:
+      name: promenade-shared-env-config
+  - configMapRef:
+      name: promenade-marketplace-tracker-env-config

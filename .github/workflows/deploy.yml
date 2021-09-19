@@ -10,26 +10,15 @@ on:
 
 jobs:
   deploy:
+    environment: testnet
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set environmental variables
-        env:
-          GITHUB_REF: ${{ github.ref }}
-          GITHUB_SHA: ${{ github.sha }}
-        run: |
-          export BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)
-          echo "IMAGE_TAG=$GITHUB_SHA" >> "$GITHUB_ENV"
-
-          if [[ $BRANCH == 'main'  ]]; then
-              echo "CHART=testnet" >> "$GITHUB_ENV"
-          else
-              echo "CHART=testnet" >> "$GITHUB_ENV"
-          fi
       - name: Deploy to k8s
         uses: wahyd4/kubectl-helm-action@master
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+          GITHUB_SHA: ${{ github.sha }}
         with:
           args: |
-            helm upgrade --install --set=image.tag=$IMAGE_TAG -f ./charts/$HELM_CHART/$CHART.yaml $HELM_CHART ./charts/$HELM_CHART --kubeconfig /tmp/config
+            helm upgrade --install --set=image.tag=$GITHUB_SHA $HELM_CHART ./charts/$HELM_CHART

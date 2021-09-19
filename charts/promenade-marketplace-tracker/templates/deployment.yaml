@@ -47,11 +47,8 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            {{- range .Values.environmentVariables }}
-            - name: {{ .name }}
-              value: {{ .value | quote }}
-            {{- end }} 
+          envFrom:
+            {{- toYaml .Values.envFrom | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
