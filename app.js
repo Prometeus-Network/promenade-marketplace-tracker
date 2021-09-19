@@ -1,6 +1,7 @@
 require("dotenv").config();
-require("./healthcheck")();
 
+const healthcheck = require("./healthcheck");
 const trackMarketPlace = require("./services/marketplacetracker");
 
 trackMarketPlace();
+healthcheck();

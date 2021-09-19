@@ -9,3 +9,5 @@ Environmental variables
 | CONTRACTADDRESS  | Marketplace Contract     | `0xBA8A36804a6BaE272fe4C8A2F5Cf551b03C26A01` |
 | API_ENDPOINT     | Marketplace API endpoint | `https://api.promenade.art`                  |
 | DECIMAL_ENDPOINT | Decimal API endpoint     | ``                                           |
+| DB_URL           | Database URL             | private                                      |
+| STORAGE_API_URL  | Storage API URL          | private                                      |

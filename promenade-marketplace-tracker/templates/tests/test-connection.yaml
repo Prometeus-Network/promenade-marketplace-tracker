@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "promenade-marketplace-tracker.fullname" . }}-test-connection"
+  labels:
+    {{- include "promenade-marketplace-tracker.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "promenade-marketplace-tracker.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
