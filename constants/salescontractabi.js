@@ -1,5 +1,5 @@
 const MarketplaceContractInfo = {
-  address: '0xBA8A36804a6BaE272fe4C8A2F5Cf551b03C26A01',
+  address: '0x6EAaB1e15C2a276f54c9239aE452A29df2148BEB',
   abi: [
     {
       anonymous: false,
