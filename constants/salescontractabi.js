@@ -1,5 +1,5 @@
 const MarketplaceContractInfo = {
-  address: '0x4100a787A4e1D3b6Bb5DfEaa9eb175D2A3617FdA',
+  address: process.env.MARKETPLACE_ADDRESS,
   abi: [
     {
       anonymous: false,
