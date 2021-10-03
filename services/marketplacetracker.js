@@ -110,6 +110,7 @@ const trackMarketPlace = () => {
       unitPrice,
       price
     ) => {
+      console.log("item sold: ", tokenID);
       seller = toLowerCase(seller);
       buyer = toLowerCase(buyer);
       nft = toLowerCase(nft);
