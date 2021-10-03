@@ -1,63 +1,69 @@
-require('dotenv').config()
-const ethers = require('ethers')
-const axios = require('axios')
+require("dotenv").config();
+const ethers = require("ethers");
+const axios = require("axios");
 
-const MarketplaceContractInfo = require('../constants/salescontractabi')
+const MarketplaceContractInfo = require("../constants/salescontractabi");
 
 const provider = new ethers.providers.JsonRpcProvider(
   process.env.NETWORK_RPC,
-  parseInt(process.env.NETWORK_CHAINID),
-)
+  parseInt(process.env.NETWORK_CHAINID)
+);
 
 const loadMarketplaceContract = () => {
-  let abi = MarketplaceContractInfo.abi
-  let address = process.env.CONTRACTADDRESS
-  let contract = new ethers.Contract(address, abi, provider)
-  return contract
-}
+  let abi = MarketplaceContractInfo.abi;
+  let address = process.env.CONTRACTADDRESS;
+  let contract = new ethers.Contract(address, abi, provider);
+  return contract;
+};
 
-const decimalStore = new Map()
+const decimalStore = new Map();
 
-const marketplaceSC = loadMarketplaceContract()
+const marketplaceSC = loadMarketplaceContract();
 
-const apiEndPoint = process.env.API_ENDPOINT
+const apiEndPoint = process.env.API_ENDPOINT;
 
-const toLowerCase = (val) => {
-  if (val) return val.toLowerCase()
-  else return val
-}
+const toLowerCase = val => {
+  if (val) return val.toLowerCase();
+  else return val;
+};
 const parseToken = async (inWei, paymentToken) => {
-  paymentToken = toLowerCase(paymentToken)
-  let tokenDecimals = decimalStore.get(paymentToken)
-  console.log(tokenDecimals)
+  paymentToken = toLowerCase(paymentToken);
+  let tokenDecimals = decimalStore.get(paymentToken);
+  console.log(tokenDecimals);
   if (tokenDecimals > 0)
-    return parseFloat(inWei.toString()) / 10 ** tokenDecimals
+    return parseFloat(inWei.toString()) / 10 ** tokenDecimals;
   let decimals = await axios({
-    method: 'get',
+    method: "get",
     url: process.env.DECIMAL_ENDPOINT + paymentToken,
-  })
-  decimals = parseInt(decimals.data.data)
-  decimalStore.set(paymentToken, decimals)
-  return parseFloat(inWei.toString()) / 10 ** decimals
-}
-const convertTime = (value) => {
-  return parseFloat(value) * 1000
-}
+  });
+  decimals = parseInt(decimals.data.data);
+  decimalStore.set(paymentToken, decimals);
+  return parseFloat(inWei.toString()) / 10 ** decimals;
+};
+const convertTime = value => {
+  return parseFloat(value) * 1000;
+};
 
 const callAPI = async (endpoint, data) => {
-  await axios({
-    method: 'post',
-    url: apiEndPoint + endpoint,
-    data,
-  })
-}
+  try {
+    await axios({
+      method: "post",
+      url: apiEndPoint + endpoint,
+      data,
+    });
+  } catch (error) {
+    console.log(`Failed request to: ${endpoint}`);
+    console.log("data:", data);
+    console.error(error);
+  }
+};
 
 const trackMarketPlace = () => {
-  console.log('marketplace tracker has been started')
+  console.log("marketplace tracker has been started");
 
   //   item listed
   marketplaceSC.on(
-    'ItemListed',
+    "ItemListed",
     async (
       owner,
       nft,
@@ -65,16 +71,16 @@ const trackMarketPlace = () => {
       quantity,
       paymentToken,
       pricePerItem,
-      startingTime,
+      startingTime
     ) => {
-      owner = toLowerCase(owner)
-      nft = toLowerCase(nft)
-      tokenID = parseInt(tokenID)
-      quantity = parseInt(quantity)
-      paymentToken = toLowerCase(paymentToken)
-      pricePerItem = await parseToken(pricePerItem, paymentToken)
-      startingTime = convertTime(startingTime)
-      await callAPI('itemListed', {
+      owner = toLowerCase(owner);
+      nft = toLowerCase(nft);
+      tokenID = parseInt(tokenID);
+      quantity = parseInt(quantity);
+      paymentToken = toLowerCase(paymentToken);
+      pricePerItem = await parseToken(pricePerItem, paymentToken);
+      startingTime = convertTime(startingTime);
+      await callAPI("itemListed", {
         owner,
         nft,
         tokenID,
@@ -82,13 +88,13 @@ const trackMarketPlace = () => {
         paymentToken,
         pricePerItem,
         startingTime,
-      })
-    },
-  )
+      });
+    }
+  );
 
   //   item sold
   marketplaceSC.on(
-    'ItemSold',
+    "ItemSold",
     async (
       seller,
       buyer,
@@ -97,16 +103,16 @@ const trackMarketPlace = () => {
       quantity,
       paymentToken,
       unitPrice,
-      price,
+      price
     ) => {
-      seller = toLowerCase(seller)
-      buyer = toLowerCase(buyer)
-      nft = toLowerCase(nft)
-      tokenID = parseInt(tokenID)
-      quantity = parseInt(quantity)
-      price = await parseToken(price, paymentToken)
-      paymentToken = toLowerCase(paymentToken)
-      await callAPI('itemSold', {
+      seller = toLowerCase(seller);
+      buyer = toLowerCase(buyer);
+      nft = toLowerCase(nft);
+      tokenID = parseInt(tokenID);
+      quantity = parseInt(quantity);
+      price = await parseToken(price, paymentToken);
+      paymentToken = toLowerCase(paymentToken);
+      await callAPI("itemSold", {
         seller,
         buyer,
         nft,
@@ -114,35 +120,41 @@ const trackMarketPlace = () => {
         quantity,
         paymentToken,
         price,
-      })
-    },
-  )
+      });
+    }
+  );
 
   //   item updated
 
   marketplaceSC.on(
-    'ItemUpdated',
+    "ItemUpdated",
     async (owner, nft, tokenID, paymentToken, price) => {
-      owner = toLowerCase(owner)
-      nft = toLowerCase(nft)
-      tokenID = parseInt(tokenID)
-      price = await parseToken(price, paymentToken)
-      paymentToken = toLowerCase(paymentToken)
-      await callAPI('itemUpdated', { owner, nft, tokenID, paymentToken, price })
-    },
-  )
+      owner = toLowerCase(owner);
+      nft = toLowerCase(nft);
+      tokenID = parseInt(tokenID);
+      price = await parseToken(price, paymentToken);
+      paymentToken = toLowerCase(paymentToken);
+      await callAPI("itemUpdated", {
+        owner,
+        nft,
+        tokenID,
+        paymentToken,
+        price,
+      });
+    }
+  );
 
   //   item cancelled
-  marketplaceSC.on('ItemCanceled', async (owner, nft, tokenID) => {
-    owner = toLowerCase(owner)
-    nft = toLowerCase(nft)
-    tokenID = parseInt(tokenID)
-    await callAPI('itemCanceled', { owner, nft, tokenID })
-  })
+  marketplaceSC.on("ItemCanceled", async (owner, nft, tokenID) => {
+    owner = toLowerCase(owner);
+    nft = toLowerCase(nft);
+    tokenID = parseInt(tokenID);
+    await callAPI("itemCanceled", { owner, nft, tokenID });
+  });
 
   // offer created
   marketplaceSC.on(
-    'OfferCreated',
+    "OfferCreated",
     async (
       creator,
       nft,
@@ -150,16 +162,16 @@ const trackMarketPlace = () => {
       quantity,
       paymentToken,
       pricePerItem,
-      deadline,
+      deadline
     ) => {
-      creator = toLowerCase(creator)
-      nft = toLowerCase(nft)
-      tokenID = parseInt(tokenID)
-      quantity = parseInt(quantity)
-      paymentToken = toLowerCase(paymentToken)
-      pricePerItem = await parseToken(pricePerItem, paymentToken)
-      deadline = convertTime(deadline)
-      await callAPI('offerCreated', {
+      creator = toLowerCase(creator);
+      nft = toLowerCase(nft);
+      tokenID = parseInt(tokenID);
+      quantity = parseInt(quantity);
+      paymentToken = toLowerCase(paymentToken);
+      pricePerItem = await parseToken(pricePerItem, paymentToken);
+      deadline = convertTime(deadline);
+      await callAPI("offerCreated", {
         creator,
         nft,
         tokenID,
@@ -167,17 +179,17 @@ const trackMarketPlace = () => {
         paymentToken,
         pricePerItem,
         deadline,
-      })
-    },
-  )
+      });
+    }
+  );
 
   // offer cancelled
-  marketplaceSC.on('OfferCanceled', async (creator, nft, tokenID) => {
-    creator = toLowerCase(creator)
-    nft = toLowerCase(nft)
-    tokenID = parseInt(tokenID)
-    await callAPI('offerCanceled', { creator, nft, tokenID })
-  })
-}
+  marketplaceSC.on("OfferCanceled", async (creator, nft, tokenID) => {
+    creator = toLowerCase(creator);
+    nft = toLowerCase(nft);
+    tokenID = parseInt(tokenID);
+    await callAPI("offerCanceled", { creator, nft, tokenID });
+  });
+};
 
-module.exports = trackMarketPlace
+module.exports = trackMarketPlace;
