@@ -97,9 +97,13 @@ const trackMarketPlace = () => {
     }
   );
 
+  marketplaceSC.on("event", (...args) => {
+    console.log("new event: ", JSON.stringify(args));
+  });
+
   //   item sold
   marketplaceSC.on(
-    "ItemSold(address,address,address,uint256,uint256,address,int256,uint256)",
+    "0x949d1413baca5c0e4ab96b0198d536cac8cdcc17cb909b9ea24594f42ed9fa0d", // keccak256 ItemSold(address,address,address,uint256,uint256,address,int256,uint256)
     async (
       seller,
       buyer,
