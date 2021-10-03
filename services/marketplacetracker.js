@@ -37,6 +37,8 @@ const parseToken = async (inWei, paymentToken) => {
     url: process.env.DECIMAL_ENDPOINT + paymentToken,
   });
   decimals = parseInt(decimals.data.data);
+  console.log("new decimals: ", decimals);
+  console.log("paymentToken: ", paymentToken);
   decimalStore.set(paymentToken, decimals);
   return parseFloat(inWei.toString()) / 10 ** decimals;
 };
