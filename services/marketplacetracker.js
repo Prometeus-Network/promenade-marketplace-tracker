@@ -99,7 +99,7 @@ const trackMarketPlace = () => {
 
   //   item sold
   marketplaceSC.on(
-    "ItemSold",
+    "ItemSold(address,address,address,uint256,uint256,address,int256,uint256)",
     async (
       seller,
       buyer,
