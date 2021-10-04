@@ -10,8 +10,7 @@ const provider = new ethers.providers.JsonRpcProvider(
 );
 
 const loadMarketplaceContract = () => {
-  let abi = MarketplaceContractInfo.abi;
-  let address = process.env.CONTRACTADDRESS;
+  let { abi, address } = MarketplaceContractInfo;
   let contract = new ethers.Contract(address, abi, provider);
   return contract;
 };
@@ -97,13 +96,9 @@ const trackMarketPlace = () => {
     }
   );
 
-  marketplaceSC.on("event", (...args) => {
-    console.log("new event: ", JSON.stringify(args));
-  });
-
   //   item sold
   marketplaceSC.on(
-    "0x949d1413baca5c0e4ab96b0198d536cac8cdcc17cb909b9ea24594f42ed9fa0d", // keccak256 ItemSold(address,address,address,uint256,uint256,address,int256,uint256)
+    "ItemSold",
     async (
       seller,
       buyer,
